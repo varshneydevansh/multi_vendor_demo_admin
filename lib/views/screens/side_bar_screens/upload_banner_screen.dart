@@ -1,7 +1,56 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-class UploadBannerScreen extends StatelessWidget {
+class UploadBannerScreen extends StatefulWidget {
   static const String routeName = '/upload-banner-screen';
+
+  @override
+  State<UploadBannerScreen> createState() => _UploadBannerScreenState();
+}
+
+class _UploadBannerScreenState extends State<UploadBannerScreen> {
+  final FirebaseStorage _firebaseBannerStorage = FirebaseStorage.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  dynamic _imagePicked;
+  String _imagePickedName = '';
+  pickImage() async {
+    FilePickerResult? imageSelection = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+    if (imageSelection != null) {
+      setState(() {
+        _imagePicked = imageSelection.files.first.bytes;
+        _imagePickedName = imageSelection.files.first.name;
+      });
+    } else {
+      print('No image selected');
+    }
+  }
+
+  _uploadBannersToStorage(dynamic imageUpload) async {
+    Reference ref =
+        _firebaseBannerStorage.ref().child('banners').child(_imagePickedName);
+    UploadTask uploadTask = ref.putData(imageUpload);
+    TaskSnapshot snapshot = await uploadTask;
+
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    return downloadURL;
+  }
+
+  uplaodToFirebase() {
+    if (_imagePicked != null) {
+      _uploadBannersToStorage(_imagePicked).then((downloadUrl) {
+        _firebaseFirestore.collection('banners').add({
+          'image': downloadUrl,
+        }).then((value) => Navigator.of(context).pop());
+      });
+    } else {
+      print('No image selected');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +82,8 @@ class UploadBannerScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-                    width: 200,
-                    height: 200,
+                    width: 300,
+                    height: 300,
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(10),
@@ -43,17 +92,18 @@ class UploadBannerScreen extends StatelessWidget {
                         width: 1,
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        'Uplaod Banner',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
+                    child: _imagePicked != null
+                        ? Image.memory(_imagePicked, fit: BoxFit.cover)
+                        : Center(
+                            child: Text(
+                              'Uplaod Banner',
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
-                
                 ElevatedButton(
                   onPressed: () {},
                   child: Text('SAVE'),
@@ -70,7 +120,9 @@ class UploadBannerScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  pickImage();
+                },
                 child: Text('UPLOAD IMAGE'),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.yellow[900],
