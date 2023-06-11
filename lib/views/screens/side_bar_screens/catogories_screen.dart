@@ -75,127 +75,130 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        child: Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          Container(
-            alignment: Alignment.topLeft,
-            padding: const EdgeInsets.all(10),
-            child: const Text(
-              'Categories',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 36,
+        child: ConstrainedBox(
+      constraints: BoxConstraints(),
+          child: Form(
+              key: _formKey,
+              child: Column(
+          children: [
+            Container(
+              alignment: Alignment.topLeft,
+              padding: const EdgeInsets.all(10),
+              child: const Text(
+                'Categories',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 36,
+                ),
               ),
             ),
-          ),
-          Divider(
-            color: Colors.black,
-            thickness: 1,
-            indent: 10,
-            endIndent: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: 300,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 1,
+            Divider(
+              color: Colors.black,
+              thickness: 1,
+              indent: 10,
+              endIndent: 10,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: 300,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1,
+                          ),
                         ),
-                      ),
-                      child: _imagePicked != null
-                          ? Image.memory(_imagePicked, fit: BoxFit.cover)
-                          : Center(
-                              child: Text(
-                                'Uplaod Category Image',
-                                style: TextStyle(
-                                  fontSize: 20,
+                        child: _imagePicked != null
+                            ? Image.memory(_imagePicked, fit: BoxFit.cover)
+                            : Center(
+                                child: Text(
+                                  'Uplaod Category Image',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  ),
                                 ),
                               ),
-                            ),
-                    ),
-                  ),
-                  Flexible(
-                    child: SizedBox(
-                      child: TextFormField(
-                        onChanged: (value) {
-                          categoryName = value;
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                            labelText: 'Enter Category Name',
-                            hintText: 'Type the Name here'),
                       ),
-                      width: 250,
                     ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  ElevatedButton(
+                    Flexible(
+                      child: SizedBox(
+                        child: TextFormField(
+                          onChanged: (value) {
+                            categoryName = value;
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'Enter Category Name',
+                              hintText: 'Type the Name here'),
+                        ),
+                        width: 250,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        uploadCategoryToFireStore();
+                      },
+                      child: Text('SAVE and UPLOAD'),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 149, 201, 151),
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
                     onPressed: () {
-                      uploadCategoryToFireStore();
+                      _pickImage();
                     },
-                    child: Text('SAVE and UPLOAD'),
+                    child: Text('Select IMAGE'),
                     style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 149, 201, 151),
+                      primary: Colors.yellow[900],
                       onPrimary: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    _pickImage();
-                  },
-                  child: Text('Select IMAGE'),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.yellow[900],
-                    onPrimary: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
                   ),
                 ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Divider(
+                color: Colors.grey,
               ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Divider(
-              color: Colors.grey,
             ),
-          ),
-          Container(
-            child: Text(
-              'Categories List',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+            Container(
+              child: Text(
+                'Categories List',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+              ),
             ),
-          ),
-          CategoryWidget()
-        ],
-      ),
-    ));
+            CategoryWidget()
+          ],
+              ),
+            ),
+        ));
   }
 }
