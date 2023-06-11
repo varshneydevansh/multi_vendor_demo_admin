@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class UploadBannerScreen extends StatefulWidget {
   static const String routeName = '/upload-banner-screen';
@@ -13,8 +14,10 @@ class UploadBannerScreen extends StatefulWidget {
 class _UploadBannerScreenState extends State<UploadBannerScreen> {
   final FirebaseStorage _firebaseBannerStorage = FirebaseStorage.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+
   dynamic _imagePicked;
   String _imagePickedName = '';
+
   pickImage() async {
     FilePickerResult? imageSelection = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -31,21 +34,30 @@ class _UploadBannerScreenState extends State<UploadBannerScreen> {
   }
 
   _uploadBannersToStorage(dynamic imageUpload) async {
-    Reference ref =
-        _firebaseBannerStorage.ref().child('banners').child(_imagePickedName);
+    Reference ref = _firebaseBannerStorage
+        .ref()
+        .child('Banners')
+        .child(_imagePickedName); // creating a folder on firebase storage
     UploadTask uploadTask = ref.putData(imageUpload);
     TaskSnapshot snapshot = await uploadTask;
 
-    String downloadURL = await snapshot.ref.getDownloadURL();
+    String downloadURL = await snapshot.ref
+        .getDownloadURL(); //ater uploading the image we are getting the download url to uplod to firebase firestore
     return downloadURL;
   }
 
-  uplaodToFirebase() {
+  uplaod_Image_to_Firestore() async {
+    EasyLoading.show(status: 'Uploading...');
     if (_imagePicked != null) {
-      _uploadBannersToStorage(_imagePicked).then((downloadUrl) {
-        _firebaseFirestore.collection('banners').add({
-          'image': downloadUrl,
-        }).then((value) => Navigator.of(context).pop());
+      String imageUrl = await _uploadBannersToStorage(_imagePicked);
+      await _firebaseFirestore.collection('Banners').doc(_imagePickedName).set({
+        'image': imageUrl,
+      }).whenComplete(() {
+        EasyLoading.dismiss();
+        setState(() {
+          _imagePicked = null;
+          _imagePickedName = '';
+        });
       });
     } else {
       print('No image selected');
@@ -105,8 +117,10 @@ class _UploadBannerScreenState extends State<UploadBannerScreen> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
-                  child: Text('SAVE'),
+                  onPressed: () {
+                    uplaod_Image_to_Firestore();
+                  },
+                  child: Text('SAVE and UPLOAD'),
                   style: ElevatedButton.styleFrom(
                     primary: Color.fromARGB(255, 149, 201, 151),
                     onPrimary: Colors.white,
@@ -123,7 +137,7 @@ class _UploadBannerScreenState extends State<UploadBannerScreen> {
                 onPressed: () {
                   pickImage();
                 },
-                child: Text('UPLOAD IMAGE'),
+                child: Text('Select IMAGE'),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.yellow[900],
                   onPrimary: Colors.white,
