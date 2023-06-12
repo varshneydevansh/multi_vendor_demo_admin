@@ -5,8 +5,10 @@ class BannerWidget extends StatelessWidget {
   BannerWidget({super.key});
   //This is the stream that is used to get the data from the firebase
   // why query snapshot? because snapshot is a collection of documents and query snapshot is a collection of query documents
-  final Stream<QuerySnapshot> _categoriesStream =
-      FirebaseFirestore.instance.collection('Banners').snapshots();
+  final Stream<QuerySnapshot> _categoriesStream = FirebaseFirestore.instance
+      .collection('Banners')
+      .orderBy('createdAt', descending: true)
+      .snapshots();
   @override
   Widget build(BuildContext context) {
     // StreamBuilder is used to get the data from the firebase and display it in the Categories page
@@ -25,7 +27,6 @@ class BannerWidget extends StatelessWidget {
         }
 
         return GridView.builder(
-          
           //SliverGridDelegateWithFixedCrossAxisCount is used to make the grid view responsive
           //crossAxisCount is the number of columns in the grid view
           //mainAxisSpacing is the space between the rows
@@ -41,23 +42,20 @@ class BannerWidget extends StatelessWidget {
           //itemBuilder is used to build the grid view
           //itemBuilder takes two parameters context and index
           shrinkWrap: true,
-          
+
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 6, mainAxisSpacing: 8, crossAxisSpacing: 8),
           itemBuilder: (context, index) {
             final bannerData = snapshot.data!.docs[index];
-            return Column(
-              children: [
-                SizedBox(
-                  child: Image.network(
-                    bannerData['image'],
-                    
-                    fit: BoxFit.cover,
-                  ),
+            return Column(children: [
+              SizedBox(
+                child: Image.network(
+                  bannerData['image'],
+                  fit: BoxFit.cover,
                 ),
-                Text(bannerData.id),
-              ]
-            );
+              ),
+              Text(bannerData.id),
+            ]);
           },
           itemCount: snapshot.data!.docs.length,
           padding: EdgeInsets.all(10),

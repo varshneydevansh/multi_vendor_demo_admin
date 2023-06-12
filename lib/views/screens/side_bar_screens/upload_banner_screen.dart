@@ -53,6 +53,7 @@ class _UploadBannerScreenState extends State<UploadBannerScreen> {
       String imageUrl = await _uploadBannersToStorage(_imagePicked);
       await _firebaseFirestore.collection('Banners').doc(_imagePickedName).set({
         'image': imageUrl,
+        'createdAt' : Timestamp.now(),
       }).whenComplete(() {
         EasyLoading.dismiss();
         setState(() {
