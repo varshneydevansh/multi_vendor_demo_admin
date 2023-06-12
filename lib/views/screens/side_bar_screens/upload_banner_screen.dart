@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:multi_vendor_demo_admin/views/screens/side_bar_screens/widgets/banner_widget.dart';
 
 class UploadBannerScreen extends StatefulWidget {
   static const String routeName = '/upload-banner-screen';
@@ -73,7 +74,7 @@ class _UploadBannerScreenState extends State<UploadBannerScreen> {
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.all(10),
           child: const Text(
-            'Promotional Banner',
+            'Upload Promotional Banner',
             style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 36,
@@ -147,8 +148,26 @@ class _UploadBannerScreenState extends State<UploadBannerScreen> {
                 ),
               ),
             ),
+            Divider(
+              color: Colors.black,
+              thickness: 1,
+              indent: 10,
+              endIndent: 10,
+            ),
           ],
         ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.all(10),
+          child: const Text(
+            'Promotional Banners List',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 36,
+            ),
+          ),
+        ),
+        BannerWidget(),
       ],
     ));
   }
